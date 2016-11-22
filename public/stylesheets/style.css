@@ -1,0 +1,15 @@
+.thumbnail img {
+  max-height: 200px;
+}
+
+.thumbnail .description {
+  color: #7f7f7f;
+}
+
+.game_show {
+  background-color: grey;
+}
+
+.game_image {
+  width: inherit;
+}
