@@ -1,9 +1,11 @@
 var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
+var passport = require('passport');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 var Game = require('../models/games');
+var Review = require('../models/reviews');
 
 
 router.use(bodyParser.urlencoded({ extended: true }))
@@ -53,6 +55,7 @@ router.post('/new', function(req, res) {
         description : description,
         producer : producer,
         releaseDate: releaseDate,
+        approved: false
     }, function (err, game) {
           if (err) {
               res.send("There was a problem adding the information to the database.");
@@ -83,7 +86,8 @@ router.param('id', function(req, res, next, id) {
     mongoose.model('Game').findById(id, function (err, game) {
         //if it isn't found, we are going to repond with 404
         if (err) {
-            console.log(id + ' was not found');
+          console.log(game);
+            console.log(id + ' was not found + here');
             res.status(404)
             var err = new Error('Not Found');
             err.status = 404;
@@ -109,32 +113,91 @@ router.param('id', function(req, res, next, id) {
 
 router.route('/:id')
   .get(function(req, res) {
-    console.log("ID: ", req.id);
+      console.log("User ID: ", req.user);
     mongoose.model('Game').findById(req.id, function (err, game) {
       if (err) {
         console.log('GET Error: There was a problem retrieving: ' + err);
       } else {
         console.log('GET Retrieving ID: ' + game._id);
+        mongoose.model('Review').find({gameID : req.id}, function (err, reviews) {
+          if (err) {
+            console.log('GET error: There was a problem retrieving: ' + err);
+          } else {
+            console.log('GET Retrieving ID: ' + reviews);
+            res.format({
+              html: function(){
+                  res.render('games/show', {
+                    game : game,
+                    title: "hello there",
+                    user: req.user,
+                    reviews: reviews
+
+                  });
+                },
+              json: function(){
+                res.json(game);
+              }
+            });
+              }
+            });
         // var gamedob = game.dob.toISOString();
         // gamedob = gamedob.substring(0, gamedob.indexOf('T'))
-        var game = game;
-        res.format({
-          html: function(){
-              res.render('games/show', {
-                game : game,
-                title: "hello there"
-              });
-          },
-          json: function(){
-              res.json(game);
-          }
-        });
+        console.log("this is the" + req.user);
       }
     });
+  })
+  .post(function(req, res) {
+    console.log("here");
+    console.log(req.id);
+    console.log(req.user);
+          // Get values from POST request. These can be done through forms or REST calls. These rely on the "name" attributes for forms
+      var immersionRating = req.body.immersion;
+      var visualsRating = req.body.visuals;
+      var soundRating = req.body.sound;
+      var gameplayRating = req.body.gameplay;
+      var interactionRating = req.body.interaction;
+      var comment = req.body.comment;
+      var gameID = req._id;
+      var userID = req.user._id;
+      // Chi wanted me to put a comma in here, but I am putting a comment in instead so he thinks I am doing what he asked
+      //call the create function for our database
+      mongoose.model('Review').create({
+          immersionRating : immersionRating,
+          visualsRating : visualsRating,
+          soundRating : soundRating,
+          gameplayRating : gameplayRating,
+          interactionRating : interactionRating,
+          comment : comment,
+          gameID : gameID,
+          userID : userID
+
+      }, function (err, review) {
+            if (err) {
+                res.send("There was a problem adding the information to the database.");
+            }
+            //Blob has been created
+            console.log('POST creating new review: ' + review);
+
+                res.format({
+                    //HTML response will set the location and redirect back to the home page. You could also create a 'success' page if that's your thing
+                  html: function(){
+                      // If it worked, set the header so the address bar doesn't still say /adduser
+                      res.location("games");
+                      console.log(game._id);
+
+                      // And forward to success page
+                      res.redirect("/games/" + review.gameID);
+                  },
+                  //JSON response will show the newly created blob
+                  json: function(){
+                      res.json(review);
+                  }
+              });
+      })
   });
 
   //GET the individual blob by Mongo ID
-router.get('/:id/edit', function(req, res) {
+router.get('/:id/edit', isLoggedInAsAdmin, function(req, res) {
     //search for the blob within Mongo
     mongoose.model('Game').findById(req.id, function (err, game) {
         if (err) {
@@ -143,15 +206,16 @@ router.get('/:id/edit', function(req, res) {
             //Return the blob
             console.log('GET Retrieving ID: ' + game._id);
             //format the date properly for the value to show correctly in our edit form
-          var gamedob = game.dob.toISOString();
-          gamedob = gamedob.substring(0, gamedob.indexOf('T'))
+          // var gamedob = game.dob.toISOString();
+          // gamedob = gamedob.substring(0, gamedob.indexOf('T'))
             res.format({
                 //HTML response will render the 'edit.jade' template
                 html: function(){
                        res.render('games/edit', {
-                          title: 'Game' + blob._id,
-                        "gamedob" : gamedob,
-                          "game" : game
+                          title: 'Game' + game._id,
+                        // "gamedob" : gamedob,
+                          "game" : game,
+                          user: req.user
                       });
                  },
                  //JSON response will return the JSON output
@@ -236,3 +300,11 @@ router.delete('/:id/edit', function (req, res){
 });
 
 module.exports = router;
+
+function isLoggedInAsAdmin(req, res, next) {
+  console.log("another");
+  if (req.isAuthenticated() && req.user.admin)  {
+    return next();
+  }
+  res.redirect('/');
+}

@@ -13,7 +13,15 @@ router.get('/profile', isLoggedIn, function(req, res, next) {
 });
 
 router.get('/dashboard', isLoggedInAsAdmin, function(req, res, next) {
- res.render('user/dashboard', {user: req.user});
+  Game.find({approved: false}, function(err, docs) {
+    if (err) res.send(err);
+    var contentChunks = [];
+    var chunkSize = 3;
+    for (var i = 0; i < docs.length; i += chunkSize) {
+        contentChunks.push(docs.slice(i, i + chunkSize));
+    }
+    res.render('user/dashboard', {user: req.user, games: contentChunks});
+  });
 });
 
 
@@ -64,7 +72,6 @@ function isLoggedIn(req, res, next) {
 }
 
 function isLoggedInAsAdmin(req, res, next) {
-  console.log("another");
   if (req.isAuthenticated() && req.user.admin)  {
     return next();
   }

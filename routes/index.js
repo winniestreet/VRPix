@@ -7,7 +7,7 @@ var Game = require('../models/games');
 router.get('/', function(req, res, next) {
   Game.find({approved: true}, function(err, docs) {
     if (err) res.send(err);
-    console.log(req.user);
+    console.log("req.user");
     var contentChunks = [];
     var chunkSize = 3;
     for (var i = 0; i < docs.length; i += chunkSize) {

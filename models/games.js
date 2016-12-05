@@ -7,7 +7,7 @@ var schema = new Schema({
     description: {type: String, required: true},
     producer: {type: String, required: true},
     releaseDate: {type: String},
-    approved: {type: Boolean, defaultValue: false}
+    approved: {type: Boolean, default: false}
 });
 
 module.exports = mongoose.model('Game', schema);

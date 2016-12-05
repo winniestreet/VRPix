@@ -1,5 +1,4 @@
 
-
 {{# each games }}
 <div class="row">
   {{# each this }}
@@ -9,6 +8,7 @@
       <div class="caption">
         <h3>{{this.title}}</h3>
         <p class="description">{{this.description}}</p>
+        <p>{{this.id}}</p>
         <p class="clearfix"><a href="/games/{{this.id}}" class="btn btn-success pull-right" role="button">Rate</a>
       </div>
     </div>

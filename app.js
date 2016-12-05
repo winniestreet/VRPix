@@ -15,6 +15,7 @@ var validator = require('express-validator');
 var routes = require('./routes/index');
 var userRoutes = require('./routes/user');
 var gameRoutes = require('./routes/game');
+var reviewRoutes = require('./routes/review');
 
 var app = express();
 
@@ -43,6 +44,7 @@ app.use(function(req, res, next) {
 });
 //this makes login route avalaible to all views
 app.use('/games', gameRoutes);
+app.use('/reviews', reviewRoutes);
 app.use('/user', userRoutes);
 app.use('/', routes);
 
