@@ -1,27 +1,44 @@
 <div class="container">
   <div class="col-md-10 game_show">
     <h1>{{game.title}}</h1>
-    <p>{{game.description}}</p>
-    <img class="game_image" src="{{game.imagePath}}"></img>
-    {{# if user.admin }}
-    <a href="/games/{{game._id}}/edit" type="submit" class="btn btn-primary">Edit</a>
-    {{/if}}
-    <form action="/games/{{game.id}}" method="post">
-      <p>Immersion</p>
-      <input id="immersion" data-slider-id='immersionSlider' type="text" data-slider-min="0" data-slider-max="10" data-slider-step="1" data-slider-value=""/>
-      <p>Visuals</p>
-      <input id="visuals" data-slider-id='visualsSlider' type="text" data-slider-min="0" data-slider-max="10" data-slider-step="1" data-slider-value=""/>
-      <p>Sound</p>
-      <input id="sound" data-slider-id='soundSlider' type="text" data-slider-min="0" data-slider-max="10" data-slider-step="1" data-slider-value=""/>
-      <p>Gameplay</p>
-      <input id="gameplay" data-slider-id='gameplaySlider' type="text" data-slider-min="0" data-slider-max="10" data-slider-step="1" data-slider-value=""/>
-      <p>Interaction</p>
-      <input id="interaction" data-slider-id='interactionSlider' type="text" data-slider-min="0" data-slider-max="10" data-slider-step="1" data-slider-value=""/>
-      <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
+      <p>{{game.description}}</p>
+      <img class="game_image" src="{{game.imagePath}}"></img>
+      {{# if user.admin }}
+      <a href="/games/{{game._id}}/edit" type="submit" class="btn btn-primary">Edit</a>
+      {{/if}}
+      {{createArray reviews}}
+      <h2>{{ this.immersionRating}}</h2>
+      <h2>{{ this.visualsRating}}</h2>
+
+        <form action="/games/{{game.id}}" method="post">
+          <p>Immersion</p>
+          <input name="immersion" id="immersion" data-slider-id='immersionSlider' type="text" data-slider-min="0" data-slider-max="10" data-slider-step="1" data-slider-value=""/>
+          <p>Visuals</p>
+          <input name="visuals" id="visuals" data-slider-id='visualsSlider' type="text" data-slider-min="0" data-slider-max="10" data-slider-step="1" data-slider-value=""/>
+          <p>Sound</p>
+          <input name="sound" id="sound" data-slider-id='soundSlider' type="text" data-slider-min="0" data-slider-max="10" data-slider-step="1" data-slider-value=""/>
+          <p>Gameplay</p>
+          <input name="gameplay" id="gameplay" data-slider-id='gameplaySlider' type="text" data-slider-min="0" data-slider-max="10" data-slider-step="1" data-slider-value=""/>
+          <p>Interaction</p>
+          <input name="interaction" id="interaction" data-slider-id='interactionSlider' type="text" data-slider-min="0" data-slider-max="10" data-slider-step="1" data-slider-value=""/>
+          <div class="form-group">
+            <label for="comment">Comment</label>
+            <textarea name="comment" class="form-control" rows="3"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      <div>
+        {{# each reviews}}
+        <h2>{{this.userID.email}}</h2>
+        <p>{{this.comment}}</p>
+        {{/each}}
+
+      </div>
+
   </div>
 
 </div>
+
 <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.5.3/bootstrap-slider.min.js" integrity="sha256-kPeeHHjF5O/nXuHuCjJCxIiOvdyW5UHeKzd2qon3oAw=" crossorigin="anonymous"></script>
 

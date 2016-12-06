@@ -115,22 +115,26 @@ router.route('/:id')
   .get(function(req, res) {
       console.log("User ID: ", req.user);
     mongoose.model('Game').findById(req.id, function (err, game) {
-      if (err) {
-        console.log('GET Error: There was a problem retrieving: ' + err);
-      } else {
-        console.log('GET Retrieving ID: ' + game._id);
-        mongoose.model('Review').find({gameID : req.id}, function (err, reviews) {
+        mongoose.model('Review').find({gameID : req.id}).populate('userID').exec(function (err, reviews) {
           if (err) {
             console.log('GET error: There was a problem retrieving: ' + err);
           } else {
+            mongoose.model('Review').populate(reviews, {
+              path: 'userID',
+              model: 'User'
+            }, function(err, reviews){
+              if(err){
+                console.log(err);
+              } else {
             console.log('GET Retrieving ID: ' + reviews);
+            
             res.format({
               html: function(){
                   res.render('games/show', {
                     game : game,
                     title: "hello there",
                     user: req.user,
-                    reviews: reviews
+                    reviews: reviews.reverse()
 
                   });
                 },
@@ -138,14 +142,13 @@ router.route('/:id')
                 res.json(game);
               }
             });
-              }
-            });
-        // var gamedob = game.dob.toISOString();
-        // gamedob = gamedob.substring(0, gamedob.indexOf('T'))
-        console.log("this is the" + req.user);
-      }
+            }
+          });
+        }
     });
-  })
+  });
+})
+
   .post(function(req, res) {
     console.log("here");
     console.log(req.id);
@@ -157,7 +160,7 @@ router.route('/:id')
       var gameplayRating = req.body.gameplay;
       var interactionRating = req.body.interaction;
       var comment = req.body.comment;
-      var gameID = req._id;
+      var gameID = req.id;
       var userID = req.user._id;
       // Chi wanted me to put a comma in here, but I am putting a comment in instead so he thinks I am doing what he asked
       //call the create function for our database
@@ -173,7 +176,7 @@ router.route('/:id')
 
       }, function (err, review) {
             if (err) {
-                res.send("There was a problem adding the information to the database.");
+                res.send("There was a problem adding the information to the database." + err);
             }
             //Blob has been created
             console.log('POST creating new review: ' + review);
@@ -183,7 +186,7 @@ router.route('/:id')
                   html: function(){
                       // If it worked, set the header so the address bar doesn't still say /adduser
                       res.location("games");
-                      console.log(game._id);
+
 
                       // And forward to success page
                       res.redirect("/games/" + review.gameID);

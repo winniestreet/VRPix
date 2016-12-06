@@ -3,14 +3,13 @@ var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
 var expressHbs = require('express-handlebars');
+var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var session = require('express-session');
 var passport = require('passport');
 var flash = require('connect-flash');
 var validator = require('express-validator');
-
 
 var routes = require('./routes/index');
 var userRoutes = require('./routes/user');
@@ -19,11 +18,17 @@ var reviewRoutes = require('./routes/review');
 
 var app = express();
 
+
+
 mongoose.connect('localhost:27017/games');
 require('./config/passport');
 // view engine setup
 app.engine('.hbs', expressHbs({defaultLayout: 'layout', extname: '.hbs'}));
+require('./public/javascripts/helpers.js');
 app.set('view engine', '.hbs');
+
+
+//
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
