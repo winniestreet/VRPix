@@ -1,8 +1,7 @@
 var expressHbs = require('express-handlebars');
-console.log("hello there");
-var hbs = expressHbs.create({
-  helpers: {
-    average: function (ratings, length){
+
+module.exports = {
+  average: function (ratings, length){
       ratingTotal = '';
       for(var i = 0; i < ratings.length; i++){
         ratingTotal += ratings[i];
@@ -10,14 +9,12 @@ var hbs = expressHbs.create({
       var average = ratingTotal / ratings.length;
       return average;
     },
-    createArray: function(reviews){
+  createArray: function(reviews){
+  console.log('creating array');
       var ratings = [];
       for(var i = 0; i < reviews.length; i++){
         ratings.push(reviews)
         return ratings;
       }
     }
-  }
-});
-
-module.exports = hbs;
+  };

@@ -4,6 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var expressHbs = require('express-handlebars');
+var helpers = require('./public/javascripts/helpers');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var session = require('express-session');
@@ -18,13 +19,17 @@ var reviewRoutes = require('./routes/review');
 
 var app = express();
 
-
+var hbs = expressHbs.create({
+  defaultLayout: 'layout',
+  helpers: helpers,
+  extname: '.hbs'
+});
 
 mongoose.connect('localhost:27017/games');
 require('./config/passport');
 // view engine setup
-app.engine('.hbs', expressHbs({defaultLayout: 'layout', extname: '.hbs'}));
-require('./public/javascripts/helpers.js');
+app.engine('.hbs', hbs.engine);
+// require('./public/javascripts/helpers.js');
 app.set('view engine', '.hbs');
 
 
